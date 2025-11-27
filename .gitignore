@@ -1,0 +1,331 @@
+# Just Fucking Linux - Git Ignore File
+# Keep our build artifacts and temporary files out of version control
+
+# Build directories
+work/
+out/
+cache/
+packages/
+repo/
+
+# Archiso build artifacts
+*.iso
+*.iso.sha256
+*.iso.sha512
+*.md5
+*.sig
+
+# Package build artifacts
+*.pkg.tar.*
+*.src.tar.*
+*.log
+*.run
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Build system files
+Makefile
+Makefile.in
+configure
+aclocal.m4
+autom4te.cache/
+
+# Test files
+test-results/
+*.test
+*.tests
+
+# Virtual machine files
+*.vdi
+*.vmdk
+*.vhd
+*.vhdx
+*.ova
+*.ovf
+*.qcow2
+
+# Archive files
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.zip
+*.rar
+*.7z
+
+# Documentation build
+docs/_build/
+docs/build/
+*.pdf
+*.html
+*.css
+
+# Logs
+*.log
+logs/
+
+# Configuration overrides (keep templates, ignore actual configs)
+configs/pacman/pacman.conf
+configs/calamares/settings.conf.local
+configs/systemd/*.service.local
+
+# Theme build artifacts
+themes/**/*.png
+themes/**/*.jpg
+themes/**/*.svg
+themes/**/*.xcf
+
+# Keep source files but ignore compiled assets
+!themes/**/*.src.svg
+!themes/**/*.xcf.in
+
+# Local development
+.env
+.env.local
+.env.development
+.env.test
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Package manager caches
+/var/cache/pacman/pkg/
+/var/cache/jfl/
+
+# User-specific files
+~/.jfl-*
+~/jfl-*
+
+# Build environment
+jfl-chroot/
+jfl-build/
+jfl-temp/
+
+# Release artifacts
+release/
+releases/
+dist/
+
+# Security files
+*.key
+*.pem
+*.crt
+*.p12
+secrets/
+private/
+
+# Performance profiling
+*.prof
+*.profraw
+
+# Coverage reports
+coverage/
+*.coverage
+.coverage
+
+# Python artifacts (if any Python tools are used)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node.js artifacts (if any Node tools are used)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Rust artifacts (if any Rust tools are used)
+target/
+Cargo.lock
+
+# Go artifacts (if any Go tools are used)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Local configuration overrides
+etc/jfl/local.conf
+etc/jfl/custom.conf
+
+# Test ISO images (keep final releases, ignore test builds)
+test-*.iso
+debug-*.iso
+experimental-*.iso
+!jfl-*.iso
+
+# Temporary mount points
+mnt/
+media/
+tmp/
+
+# Build scripts output
+scripts/**/*.out
+scripts/**/*.log
+scripts/**/*.tmp
+
+# Documentation drafts
+docs/drafts/
+docs/wip/
+
+# Local scripts (keep versioned scripts)
+scripts/local/
+scripts/personal/
+
+# Archive and distribution
+dist/
+build/
+target/
+
+# Keep important files but ignore their outputs
+!scripts/build/build-jfl-iso.sh
+!scripts/build/setup-build-env.sh
+!packages/jfl-tools/fucking
+!packages/jfl-tools/just
+!packages/branding/jfl-core-branding/PKGBUILD
+!configs/pacman/pacman-jfl.conf
+!themes/gtk/JFL-Budgie/gtk-3.0/gtk.css
+!themes/grub/jfl/theme.txt
+
+# Ignore compiled/built versions of the above
+scripts/build/build-jfl-iso.sh.out
+scripts/build/setup-build-env.sh.out
+packages/jfl-tools/fucking.compiled
+packages/jfl-tools/just.compiled
+configs/pacman/pacman-jfl.conf.local
+themes/gtk/JFL-Budgie/gtk-3.0/gtk.css.bak
+
+# IDE and editor specific
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/shelf
+.idea/contentModel.xml
+.idea/dataSources.ids
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+.idea/gradle.xml
+idea.gradle.is.running
+
+# OS specific
+.DS_Store?
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Network and connectivity
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+# node-waf configuration
+.lock-wscript
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript v1 declaration files
+typings/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Local Netlify folder
+.netlify
+
+# Keep this file at the end
+# End of .gitignore
