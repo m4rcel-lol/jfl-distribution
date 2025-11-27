@@ -1,0 +1,12 @@
+[Unit]
+Description=Just Fucking Linux Message of the Day
+After=network.target
+ConditionPathExists=!/etc/no-motd
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/jfl-motd
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

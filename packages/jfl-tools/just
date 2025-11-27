@@ -1,0 +1,245 @@
+#!/bin/bash
+
+# Just Fucking Linux Sudo Alias
+# "just" - because typing "sudo" is boring
+# Version: 1.0.0
+# Author: Just Fucking Linux Project
+
+# Configuration
+JFL_VERSION="1.0.0"
+JFL_CONFIG="/etc/jfl/just.conf"
+
+# Colors
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Sarcastic messages for different commands
+MESSAGES=(
+    "Just do it already."
+    "About fucking time."
+    "Let's get this shit done."
+    "Finally taking action, huh?"
+    "Don't fuck this up."
+    "Here we go again."
+    "Let's break some stuff."
+    "Time to make some poor decisions."
+    "What could possibly go wrong?"
+    "Execute with extreme prejudice."
+)
+
+ELEVATION_MESSAGES=(
+    "Elevating your privileges... don't get power-hungry."
+    "Becoming root. Try not to nuke the system."
+    "Gaining sudo access. Responsibility is overrated."
+    "Root privileges acquired. Use them wisely (or not)."
+    "Elevated to administrator. The system fears you."
+    "Sudo mode activated. Go wild."
+    "Root access granted. With great power comes great fuck-ups."
+    "Becoming superuser. Don't break everything."
+    "Privileges escalated. The system is at your mercy."
+    "Root access: because you know better than the system."
+)
+
+# Get random message
+get_random_message() {
+    local messages=("$@")
+    echo "${messages[$RANDOM % ${#messages[@]}]}"
+}
+
+# Print colored message
+print_message() {
+    local color="$1"
+    local message="$2"
+    echo -e "${color}JFL: ${message}${NC}"
+}
+
+# Check if command needs sudo
+needs_sudo() {
+    local cmd="$1"
+    
+    # Commands that typically need sudo
+    local sudo_commands=(
+        "pacman" "systemctl" "mount" "umount" "reboot" "shutdown" "poweroff"
+        "mkfs" "fdisk" "parted" "cryptsetup" "iptables" "ufw" "firewalld"
+        "useradd" "usermod" "userdel" "passwd" "chown" "chmod" "chgrp"
+        "dnf" "yum" "apt" "apt-get" "zypper" "emerge" "xbps-install"
+        "docker" "podman" "virsh" "virt-install" "modprobe" "insmod"
+        "grub-install" "update-grub" "bootctl" "kernel-install"
+        "pip" "npm" "gem" "cargo" "go" "composer" "maven"
+        "crontab" "systemd-run" "journalctl" "dmesg" "lsblk" "lsof"
+        "fucking" "mount" "umount" "swapon" "swapoff" "mkswap"
+    )
+    
+    for sudo_cmd in "${sudo_commands[@]}"; do
+        if [[ "$cmd" == "$sudo_cmd" ]] || [[ "$cmd" == *"fucking"* ]]; then
+            return 0
+        fi
+    done
+    
+    # Check if command is in system directories
+    local cmd_path=$(command -v "$cmd" 2>/dev/null)
+    if [[ -n "$cmd_path" ]]; then
+        if [[ "$cmd_path" =~ ^/(usr/)?sbin/ ]] || [[ "$cmd_path" =~ ^/bin/ ]] || [[ "$cmd_path" =~ ^/usr/bin/ ]]; then
+            # Additional check for system modification commands
+            case "$cmd" in
+                *install*|*remove*|*update*|*upgrade*|*config*|*service*|*daemon*)
+                    return 0
+                    ;;
+            esac
+        fi
+    fi
+    
+    return 1
+}
+
+# Show help
+show_help() {
+    echo -e "${RED}${BOLD}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}${BOLD}║${WHITE}                    Just Fucking Linux Sudo Alias               ${RED}${BOLD}║${NC}"
+    echo -e "${RED}${BOLD}║${WHITE}                          Version ${JFL_VERSION}                    ${RED}${BOLD}║${NC}"
+    echo -e "${RED}${BOLD}╚══════════════════════════════════════════════════════════════╝${NC}"
+    echo
+    echo -e "${WHITE}Usage:${NC}"
+    echo -e "  ${CYAN}just${NC} ${YELLOW}<command>${NC} ${WHITE}[arguments]${NC}"
+    echo
+    echo -e "${WHITE}Description:${NC}"
+    echo -e "  'just' is a sarcastic wrapper around sudo that adds JFL attitude"
+    echo -e "  to your administrative commands. It automatically detects when"
+    echo -e "  sudo is needed and elevates privileges accordingly."
+    echo
+    echo -e "${WHITE}Examples:${NC}"
+    echo -e "  ${CYAN}just fucking install${NC} ${WHITE}firefox${NC}           # Install Firefox with JFL package manager"
+    echo -e "  ${CYAN}just systemctl restart${NC} ${WHITE}network${NC}        # Restart network service"
+    echo -e "  ${CYAN}just pacman -Syu${NC}                         # Update system"
+    echo -e "  ${CYAN}just reboot${NC}                             # Reboot system"
+    echo
+    echo -e "${WHITE}Special Features:${NC}"
+    echo -e "  • Auto-detects when sudo is needed"
+    echo -e "  • Sarcastic messages for entertainment"
+    echo -e "  • Colorful output for better visibility"
+    echo -e "  • Works with any command, not just fucking"
+    echo
+    echo -e "${WHITE}Notes:${NC}"
+    echo -e "  • If sudo is not needed, runs command directly"
+    echo -e "  • If sudo is needed, prompts for password"
+    echo -e "  • All sudo logging and security applies"
+    echo -e "  • Your password timeout is preserved"
+    echo
+    echo -e "${YELLOW}JFL: Because 'sudo' is too boring for Just Fucking Linux.${NC}"
+}
+
+# Show version
+show_version() {
+    echo "Just Fucking Linux Sudo Alias v$JFL_VERSION"
+    echo "Because administrative tasks need more attitude."
+}
+
+# Easter egg commands
+handle_easter_eggs() {
+    local cmd="$1"
+    
+    case "$cmd" in
+        "fuck"|"fuckoff"|"fucking")
+            print_message "$RED" "Fuck you too. Now run a real command."
+            return 0
+            ;;
+        "help"|"--help"|"-h")
+            show_help
+            return 0
+            ;;
+        "version"|"--version"|"-v")
+            show_version
+            return 0
+            ;;
+        "status"|"info")
+            print_message "$BLUE" "Just Fucking Linux Sudo Alias Status:"
+            echo -e "  Version: ${GREEN}$JFL_VERSION${NC}"
+            echo -e "  Config: $JFL_CONFIG"
+            echo -e "  User: $(whoami)"
+            echo -e "  UID: $EUID"
+            if sudo -n true 2>/dev/null; then
+                echo -e "  Sudo: ${GREEN}Active (no password needed)${NC}"
+            else
+                echo -e "  Sudo: ${YELLOW}Password required${NC}"
+            fi
+            return 0
+            ;;
+        "motd")
+            print_message "$CYAN" "Just Fucking Linux - Because Linux should be honest."
+            echo -e "  ${WHITE}Today's message:${NC} $(get_random_message "${MESSAGES[@]}")"
+            return 0
+            ;;
+        "insult")
+            local insults=(
+                "You couldn't even install Arch without a script."
+                "Your distro-hopping skills are legendary."
+                "I've seen better configuration in /etc/hosts."
+                "Your .bashrc is probably a mess."
+                "You still use nano, don't you?"
+                "Git blame would show your name everywhere."
+                "Your commit messages are probably 'fix stuff'."
+                "You think Ubuntu is 'user-friendly'."
+                "You have aliases for ls -la, don't you?"
+                "Your PATH includes the current directory, doesn't it?"
+            )
+            print_message "$RED" "$(get_random_message "${insults[@]}")"
+            return 0
+            ;;
+    esac
+    
+    return 1
+}
+
+# Main execution
+main() {
+    # Check if any arguments provided
+    if [[ $# -eq 0 ]]; then
+        print_message "$YELLOW" "Just what? You need to tell me what to do."
+        echo
+        show_help
+        exit 1
+    fi
+    
+    local cmd="$1"
+    
+    # Handle special commands and easter eggs
+    if handle_easter_eggs "$cmd"; then
+        exit 0
+    fi
+    
+    # Print sarcastic message
+    print_message "$YELLOW" "$(get_random_message "${MESSAGES[@]}")"
+    
+    # Check if command needs sudo
+    if needs_sudo "$cmd"; then
+        print_message "$CYAN" "$(get_random_message "${ELEVATION_MESSAGES[@]}")"
+        
+        # Execute with sudo
+        if sudo "$@"; then
+            print_message "$GREEN" "Done. Try not to break anything else."
+        else
+            local exit_code=$?
+            print_message "$RED" "Well, that didn't work out. Exit code: $exit_code"
+            exit $exit_code
+        fi
+    else
+        # Execute without sudo
+        if "$@"; then
+            print_message "$GREEN" "Command completed. No sudo needed, surprisingly."
+        else
+            local exit_code=$?
+            print_message "$RED" "Command failed. Exit code: $exit_code"
+            exit $exit_code
+        fi
+    fi
+}
+
+# Run main function with all arguments
+main "$@"

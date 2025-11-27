@@ -1,0 +1,170 @@
+# Just Fucking Linux GRUB Theme
+# Dark theme with aggressive red accents
+
+# Global settings
+desktop-color: "#1C1C1E"
+desktop-image: "jfl-background.png"
+terminal-font: "Hack Regular 14"
+terminal-box: "jfl-terminal.png"
+terminal-left: "0"
+terminal-top: "0"
+terminal-width: "100%"
+terminal-height: "100%"
+
+# Boot menu settings
++ boot_menu {
+    left = 25%
+    top = 30%
+    width = 50%
+    height = 40%
+    item_font = "Hack Bold 16"
+    item_color = "#F2F2F7"
+    selected_item_color = "#FFFFFF"
+    item_height = 30
+    item_spacing = 10
+    item_pixmap_style = "center"
+    selected_item_pixmap_style = "center"
+    menu_pixmap_style = "center"
+    
+    # Selected item background
+    selected_item_font = "Hack Bold 16"
+    selected_item_color = "#FFFFFF"
+    selected_item_bgcolor = "#FF3B30"
+    
+    # Menu border
+    menu_border = 2
+    menu_border_color = "#FF3B30"
+    menu_bgcolor = "#1C1C1E"
+    
+    # Icons
+    icon_width = 32
+    icon_height = 32
+    item_icon_space = 20
+}
+
+# Progress bar
++ progress {
+    id = "__timeout__"
+    left = 25%
+    top = 75%
+    width = 50%
+    height = 6
+    text_color = "#F2F2F7"
+    bar_color = "#FF3B30"
+    bar_bgcolor = "#2C2C2E"
+    font = "Hack Bold 12"
+    text = "Booting in %d seconds..."
+}
+
+# Title
++ title {
+    left = 50%
+    top = 10%
+    width = 80%
+    align = "center"
+    text_color = "#FF3B30"
+    font = "Bebas Neue 48"
+    text = "Just Fucking Linux"
+}
+
+# Subtitle
++ subtitle {
+    left = 50%
+    top = 18%
+    width = 60%
+    align = "center"
+    text_color = "#8E8E93"
+    font = "Hack 16"
+    text = "Linux for people who are tired of Linux's bullshit"
+}
+
+# Help text
++ help {
+    left = 50%
+    top = 85%
+    width = 80%
+    align = "center"
+    text_color = "#8E8E93"
+    font = "Hack 12"
+    text = "Use arrow keys to select, Enter to boot, 'e' to edit, 'c' for command line"
+}
+
+# Boot entries with custom icons
++ class {
+    left = 0
+    top = 0
+    width = 100%
+    height = 100%
+    
+    # JFL Linux entry
+    + boot_menu {
+        item = 0
+        icon = "jfl-linux.png"
+    }
+    
+    # Advanced options
+    + boot_menu {
+        item = 1
+        icon = "jfl-advanced.png"
+    }
+    
+    # Windows entry (if present)
+    + boot_menu {
+        item = 2
+        icon = "jfl-windows.png"
+    }
+    
+    # Firmware setup
+    + boot_menu {
+        item = 3
+        icon = "jfl-firmware.png"
+    }
+    
+    # Shutdown
+    + boot_menu {
+        item = 4
+        icon = "jfl-shutdown.png"
+    }
+    
+    # Reboot
+    + boot_menu {
+        item = 5
+        icon = "jfl-reboot.png"
+    }
+}
+
+# Resolution settings
++ gfxmode {
+    mode = "auto"
+}
+
+# Timeout settings
++ timeout {
+    style = "progress"
+    timeout = 10
+    show_message = true
+}
+
+# Color scheme definitions
++ color {
+    normal = "#F2F2F7"
+    highlight = "#FF3B30"
+    help = "#8E8E93"
+    background = "#1C1C1E"
+    border = "#FF3B30"
+    window = "#2C2C2E"
+}
+
+# Font fallbacks
++ font {
+    fallback = "Hack"
+    fallback_size = 14
+}
+
+# Animation settings (if supported)
++ animation {
+    fade_in = 300
+    fade_out = 300
+    slide_in = 200
+    slide_out = 200
+}

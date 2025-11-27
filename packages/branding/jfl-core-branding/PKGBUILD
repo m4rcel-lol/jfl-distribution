@@ -1,0 +1,93 @@
+# Maintainer: Just Fucking Linux Project
+# Contributor: JFL Build Team
+
+pkgname=jfl-core-branding
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Just Fucking Linux core branding and the fucking system files"
+arch=('any')
+url="https://bloxra.pro"
+license=('GPL3')
+depends=('bash' 'systemd')
+options=('!strip')
+backup=('etc/jfl/release' 'etc/jfl/motd')
+source=(
+    'jfl-release'
+    'jfl-motd'
+    'jfl-welcome'
+    'jfl-motd.service'
+    'jfl-logos.tar.gz'
+)
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+package() {
+    # Create directories
+    install -d "$pkgdir"/etc/jfl
+    install -d "$pkgdir"/usr/bin
+    install -d "$pkgdir"/usr/share/pixmaps
+    install -d "$pkgdir"/usr/share/applications
+    install -d "$pkgdir"/etc/systemd/system/multi-user.target.wants
+    install -d "$pkgdir"/usr/lib/systemd/system
+    
+    # Install system files
+    install -m644 jfl-release "$pkgdir/etc/jfl/release"
+    install -m644 jfl-motd "$pkgdir/etc/jfl/motd"
+    install -m755 jfl-welcome "$pkgdir/usr/bin/jfl-welcome"
+    
+    # Install systemd service
+    install -m644 jfl-motd.service "$pkgdir/usr/lib/systemd/system/"
+    ln -s /usr/lib/systemd/system/jfl-motd.service "$pkgdir/etc/systemd/system/multi-user.target.wants/"
+    
+    # Install logos and icons
+    tar -xzf jfl-logos.tar.gz -C "$pkgdir/usr/share/pixmaps/"
+    
+    # Install desktop entries
+    cat > "$pkgdir/usr/share/applications/jfl-welcome.desktop" << EOF
+[Desktop Entry]
+Name=JFL Welcome
+Comment=Just Fucking Linux first-time setup
+Exec=jfl-welcome
+Icon=jfl-logo
+Terminal=false
+Type=Application
+Categories=System;Settings;
+StartupNotify=false
+EOF
+    
+    cat > "$pkgdir/usr/share/applications/jfl-info.desktop" << EOF
+[Desktop Entry]
+Name=Just Fucking Linux Info
+Comment=Information about your JFL system
+Exec=sh -c 'cat /etc/jfl/release && echo && cat /etc/jfl/motd'
+Icon=jfl-logo
+Terminal=true
+Type=Application
+Categories=System;Documentation;
+StartupNotify=false
+EOF
+}
+
+post_install() {
+    echo ""
+    echo -e "\e[1;31mJFL: Core branding installed. Your system now has attitude.\e[0m"
+    echo -e "\e[1;33mJFL: Run 'jfl-welcome' for first-time setup.\e[0m"
+    echo ""
+}
+
+post_upgrade() {
+    echo ""
+    echo -e "\e[1;31mJFL: Core branding updated. Enjoy the fresh rebellion.\e[0m"
+    echo ""
+}
+
+post_remove() {
+    echo ""
+    echo -e "\e[1;31mJFL: Core branding removed. Your system is boring again.\e[0m"
+    echo ""
+}

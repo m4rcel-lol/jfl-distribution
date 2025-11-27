@@ -1,0 +1,633 @@
+#!/bin/bash
+
+# Just Fucking Linux Package Manager
+# A sarcastic wrapper around pacman with attitude
+# Version: 1.0.0
+# Author: Just Fucking Linux Project
+
+# Configuration
+JFL_VERSION="1.0.0"
+JFL_CONFIG="/etc/jfl/fucking.conf"
+JFL_CACHE_DIR="/var/cache/jfl"
+JFL_LOG_FILE="/var/log/jfl/fucking.log"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+BOLD='\033[1m'
+NC='\033[0m' # No Color
+
+# Sarcastic message arrays
+INSTALL_MESSAGES=(
+    "Finally getting off your ass and installing something?"
+    "About time. What took you so long?"
+    "Let's see if you can fuck this up too."
+    "Great choice. Not like you had any better ideas."
+    "Installing... don't hold your breath."
+    "This better be worth my time."
+    "Another package to clutter your system."
+    "I hope you know what you're doing."
+    "Downloading more internet clutter..."
+    "Your wish is my command (unfortunately)."
+)
+
+REMOVE_MESSAGES=(
+    "Finally cleaning up your mess?"
+    "Getting rid of your mistakes, are we?"
+    "About time you removed this garbage."
+    "Spring cleaning already?"
+    "Making space for more bad decisions."
+    "Removing evidence of your poor choices."
+    "Out with the old, in with the new crap."
+    "Deleting your regrets."
+    "Purging the system of your sins."
+    "One less thing to worry about."
+)
+
+SEARCH_MESSAGES=(
+    "Let's see what shit we can find..."
+    "Searching the infinite void of packages."
+    "Looking for needles in the package haystack."
+    "Consulting the crystal ball of packages."
+    "Scanning the repository desert."
+    "Hunting for software unicorns."
+    "Diving into the package abyss."
+    "Seeking software enlightenment."
+    "Exploring the digital marketplace."
+    "Querying the package oracle."
+)
+
+UPDATE_MESSAGES=(
+    "Time to download more internet."
+    "Refreshing your package knowledge."
+    "Updating the database of doom."
+    "Syncing with the mothership."
+    "Downloading fresh package metadata."
+    "Polling the repository gods."
+    "Checking for newer, shinier breakage."
+    "Updating your package horizons."
+    "Fetching the latest and greatest."
+    "Synchronizing your digital existence."
+)
+
+UPGRADE_MESSAGES=(
+    "Let's break some shit with updates!"
+    "Time to live dangerously and upgrade everything."
+    "Upgrading: pray to the Linux gods."
+    "Updating everything. What could possibly go wrong?"
+    "Commencing system-wide transformation."
+    "Applying patches and breaking things."
+    "Upgrading your digital life."
+    "System evolution in progress."
+    "Installing newer, potentially broken versions."
+    "May the update gods be with you."
+)
+
+SUCCESS_MESSAGES=(
+    "Holy shit, it actually worked!"
+    "Surprisingly successful."
+    "Well, that didn't fuck up completely."
+    "Mission accomplished, I guess."
+    "Done. Don't get used to it."
+    "Success against all odds."
+    "It worked. Don't ask how."
+    "Completed. Now don't touch it."
+    "Finished. Try not to break it immediately."
+    "Success. I'm as shocked as you are."
+)
+
+ERROR_MESSAGES=(
+    "Well, that fucked up spectacularly."
+    "Congratulations, you broke it."
+    "And... it's fucked. Classic."
+    "Error achieved. You must be proud."
+    "Failure level: expert."
+    "Congratulations on breaking the system."
+    "Well, that was a disaster."
+    "Error: user incompetence detected."
+    "Failed. Shocker, I know."
+    "And so it begins: the descent into madness."
+)
+
+# Initialize logging
+init_logging() {
+    mkdir -p "$(dirname "$JFL_LOG_FILE")"
+    mkdir -p "$JFL_CACHE_DIR"
+}
+
+# Print colored header
+print_header() {
+    echo -e "${RED}${BOLD}╔══════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}${BOLD}║${WHITE}                    Just Fucking Linux Package Manager           ${RED}${BOLD}║${NC}"
+    echo -e "${RED}${BOLD}║${WHITE}                          Version ${JFL_VERSION}                    ${RED}${BOLD}║${NC}"
+    echo -e "${RED}${BOLD}╚══════════════════════════════════════════════════════════════╝${NC}"
+}
+
+# Get random message from array
+get_random_message() {
+    local messages=("$@")
+    echo "${messages[$RANDOM % ${#messages[@]}]}"
+}
+
+# Print sarcastic message
+print_sarcastic() {
+    local message="$1"
+    echo -e "${YELLOW}JFL: ${message}${NC}"
+}
+
+# Print success message
+print_success() {
+    local message="$1"
+    echo -e "${GREEN}JFL: ${message}${NC}"
+}
+
+# Print error message
+print_error() {
+    local message="$1"
+    echo -e "${RED}JFL: ${message}${NC}"
+}
+
+# Print info message
+print_info() {
+    local message="$1"
+    echo -e "${BLUE}JFL: ${message}${NC}"
+}
+
+# Check if running as root
+check_root() {
+    if [[ $EUID -ne 0 ]]; then
+        print_error "You need to be fucking root for this operation."
+        exit 1
+    fi
+}
+
+# Log action
+log_action() {
+    local action="$1"
+    local packages="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] $action: $packages" >> "$JFL_LOG_FILE"
+}
+
+# Check if pacman is available
+check_pacman() {
+    if ! command -v pacman &> /dev/null; then
+        print_error "pacman not found. How the fuck did you install this?"
+        exit 1
+    fi
+}
+
+# Show package info with JFL flair
+show_package_info() {
+    local package="$1"
+    print_info "Package information for: ${BOLD}${package}${NC}"
+    pacman -Si "$package" 2>/dev/null || {
+        print_error "Package '$package' not found. Did you misspell it?"
+        return 1
+    }
+}
+
+# Install packages
+install_packages() {
+    local packages=("$@")
+    
+    if [[ ${#packages[@]} -eq 0 ]]; then
+        print_error "You didn't specify any packages to install. Brilliant."
+        return 1
+    fi
+    
+    print_sarcastic "$(get_random_message "${INSTALL_MESSAGES[@]}")"
+    
+    print_info "Installing packages: ${BOLD}${packages[*]}${NC}"
+    
+    # Check if packages exist
+    for pkg in "${packages[@]}"; do
+        if ! pacman -Sp "$pkg" &>/dev/null; then
+            print_error "Package '$pkg' not found in repositories."
+            print_info "Try searching for it with: fucking search $pkg"
+            return 1
+        fi
+    done
+    
+    # Show what will be installed
+    print_info "Package details:"
+    pacman -Si "${packages[@]}" | grep -E "(Name|Version|Description|Installed Size)"
+    
+    echo
+    print_info "Proceed with installation? [Y/n]"
+    read -r response
+    
+    if [[ "$response" =~ ^[Nn]$ ]]; then
+        print_sarcastic "Changed your mind? Smart move."
+        return 0
+    fi
+    
+    # Install packages
+    if pacman -S "${packages[@]}"; then
+        print_success "$(get_random_message "${SUCCESS_MESSAGES[@]}")"
+        log_action "INSTALL" "${packages[*]}"
+        
+        # Show post-install info
+        echo
+        print_info "Installed packages:"
+        pacman -Q "${packages[@]}"
+        
+        # Suggest related packages
+        echo
+        print_info "You might also want:"
+        for pkg in "${packages[@]}"; do
+            local related=$(pacman -Sg "$pkg" 2>/dev/null | head -3)
+            if [[ -n "$related" ]]; then
+                echo "  - $related"
+            fi
+        done
+    else
+        print_error "$(get_random_message "${ERROR_MESSAGES[@]}")"
+        return 1
+    fi
+}
+
+# Remove packages
+remove_packages() {
+    local packages=("$@")
+    
+    if [[ ${#packages[@]} -eq 0 ]]; then
+        print_error "No packages specified. What are you trying to remove?"
+        return 1
+    fi
+    
+    print_sarcastic "$(get_random_message "${REMOVE_MESSAGES[@]}")"
+    
+    # Check if packages are installed
+    local not_installed=()
+    for pkg in "${packages[@]}"; do
+        if ! pacman -Q "$pkg" &>/dev/null; then
+            not_installed+=("$pkg")
+        fi
+    done
+    
+    if [[ ${#not_installed[@]} -gt 0 ]]; then
+        print_error "These packages are not installed: ${not_installed[*]}"
+        print_info "Can't remove what doesn't exist, genius."
+        return 1
+    fi
+    
+    print_info "Removing packages: ${BOLD}${packages[*]}${NC}"
+    
+    # Show dependencies that will also be removed
+    print_info "This will also remove:"
+    pacman -Rcsp "${packages[@]}" --print 2>/dev/null || true
+    
+    echo
+    print_info "Proceed with removal? [Y/n]"
+    read -r response
+    
+    if [[ "$response" =~ ^[Nn]$ ]]; then
+        print_sarcastic "Keeping your digital hoard, I see."
+        return 0
+    fi
+    
+    # Remove packages
+    if pacman -R "${packages[@]}"; then
+        print_success "$(get_random_message "${SUCCESS_MESSAGES[@]}")"
+        log_action "REMOVE" "${packages[*]}"
+        
+        # Show freed space
+        local freed_space=$(pacman -Qi "${packages[@]}" 2>/dev/null | awk '/Installed Size/ {sum += $4} END {print sum}' | numfmt --to=iec)
+        print_info "Freed approximately ${freed_space} of disk space."
+    else
+        print_error "$(get_random_message "${ERROR_MESSAGES[@]}")"
+        return 1
+    fi
+}
+
+# Search packages
+search_packages() {
+    local query="$*"
+    
+    if [[ -z "$query" ]]; then
+        print_error "Search for what? Your lost dignity?"
+        print_info "Usage: fucking search <query>"
+        return 1
+    fi
+    
+    print_sarcastic "$(get_random_message "${SEARCH_MESSAGES[@]}")"
+    
+    print_info "Searching for: ${BOLD}${query}${NC}"
+    echo
+    
+    # Search in repositories
+    local results=$(pacman -Ss "$query" 2>/dev/null)
+    
+    if [[ -z "$results" ]]; then
+        print_error "No packages found. Try different search terms."
+        return 1
+    fi
+    
+    # Format results nicely
+    echo "$results" | while IFS= read -r line; do
+        if [[ "$line" =~ ^[^/]+/[^[:space:]]+ ]]; then
+            local repo=$(echo "$line" | cut -d'/' -f1)
+            local pkg=$(echo "$line" | cut -d'/' -f2 | cut -d' ' -f1)
+            local desc=$(echo "$line" | cut -d' ' -f3-)
+            
+            if [[ "$repo" =~ ^(jfl-|arch-) ]]; then
+                echo -e "${CYAN}$repo/${BOLD}$pkg${NC}"
+            else
+                echo -e "${YELLOW}$repo/${BOLD}$pkg${NC}"
+            fi
+            echo -e "  $desc"
+        else
+            echo -e "  ${WHITE}$line${NC}"
+        fi
+    done
+    
+    echo
+    print_info "Found $(echo "$results" | grep -c '^[^/].*/') matching packages."
+}
+
+# Update package databases
+update_databases() {
+    print_sarcastic "$(get_random_message "${UPDATE_MESSAGES[@]}")"
+    
+    print_info "Updating package databases..."
+    
+    if pacman -Sy; then
+        print_success "Databases updated. Now you know what's available to break."
+        log_action "UPDATE" "package databases"
+    else
+        print_error "Failed to update databases. Check your internet connection."
+        return 1
+    fi
+}
+
+# Upgrade system
+upgrade_system() {
+    print_sarcastic "$(get_random_message "${UPGRADE_MESSAGES[@]}")"
+    
+    print_info "Checking for updates..."
+    
+    # Check if updates are available
+    local updates=$(pacman -Qu 2>/dev/null)
+    if [[ -z "$updates" ]]; then
+        print_info "No updates available. Your system is already (relatively) up to date."
+        return 0
+    fi
+    
+    print_info "Updates available:"
+    echo "$updates"
+    echo
+    
+    print_info "Proceed with system upgrade? [Y/n]"
+    read -r response
+    
+    if [[ "$response" =~ ^[Nn]$ ]]; then
+        print_sarcastic "Living on the edge with outdated software. Bold."
+        return 0
+    fi
+    
+    print_info "Upgrading system. This might take a while..."
+    print_info "Go make coffee, contemplate your life choices, etc."
+    
+    if pacman -Syu; then
+        print_success "$(get_random_message "${SUCCESS_MESSAGES[@]}")"
+        log_action "UPGRADE" "system"
+        
+        # Show summary
+        echo
+        print_info "Upgrade completed. Check for any .pacnew files to merge."
+        
+        # Check for orphan packages
+        local orphans=$(pacman -Qtdq 2>/dev/null)
+        if [[ -n "$orphans" ]]; then
+            echo
+            print_info "Orphaned packages found (no longer needed):"
+            echo "$orphans"
+            print_info "Remove them with: fucking remove \$(pacman -Qtdq)"
+        fi
+        
+        # Check for pacnew files
+        local pacnew=$(find /etc -name "*.pacnew" 2>/dev/null)
+        if [[ -n "$pacnew" ]]; then
+            echo
+            print_info "New configuration files found:"
+            echo "$pacnew"
+            print_info "Review and merge these files manually."
+        fi
+    else
+        print_error "$(get_random_message "${ERROR_MESSAGES[@]}")"
+        print_info "Check the logs above for specific error details."
+        return 1
+    fi
+}
+
+# Show package information
+info_packages() {
+    local packages=("$@")
+    
+    if [[ ${#packages[@]} -eq 0 ]]; then
+        print_error "Info about what? Be specific."
+        print_info "Usage: fucking info <package>"
+        return 1
+    fi
+    
+    for pkg in "${packages[@]}"; do
+        show_package_info "$pkg"
+        echo
+    done
+}
+
+# List installed packages
+list_packages() {
+    local filter="$1"
+    
+    print_info "Listing installed packages..."
+    
+    if [[ -n "$filter" ]]; then
+        pacman -Qqs "$filter" | while IFS= read -r pkg; do
+            echo -e "${GREEN}$pkg${NC} - $(pacman -Qd "$pkg" 2>/dev/null | cut -d' ' -f2- || echo "No description")"
+        done
+    else
+        local count=$(pacman -Q | wc -l)
+        print_info "You have ${BOLD}$count${NC} packages installed."
+        print_info "Show them all? That's a lot. [y/N]"
+        read -r response
+        
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            pacman -Q | while IFS= read -r line; do
+                local pkg=$(echo "$line" | cut -d' ' -f1)
+                local ver=$(echo "$line" | cut -d' ' -f2)
+                echo -e "${GREEN}$pkg${NC} ${YELLOW}$ver${NC}"
+            done
+        fi
+    fi
+}
+
+# Clean package cache
+clean_cache() {
+    print_sarcastic "Time to purge the digital filth..."
+    
+    print_info "Current cache size:"
+    du -sh /var/cache/pacman/pkg 2>/dev/null || print_info "No cache found."
+    
+    echo
+    print_info "Clean all cached packages? [y/N]"
+    read -r response
+    
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        if pacman -Scc; then
+            print_success "Cache cleaned. Your disk space thanks you."
+            log_action "CLEAN" "package cache"
+        else
+            print_error "Failed to clean cache."
+            return 1
+        fi
+    fi
+}
+
+# Show system statistics
+show_stats() {
+    print_info "Just Fucking Linux System Statistics"
+    echo -e "${RED}${BOLD}═══════════════════════════════════════════════════════════════${NC}"
+    
+    # System info
+    echo -e "${WHITE}System Information:${NC}"
+    echo -e "  Kernel: $(uname -r)"
+    echo -e "  Uptime: $(uptime -p)"
+    echo -e "  Memory: $(free -h | awk '/^Mem:/ {print $3 "/" $2}')"
+    echo -e "  Disk: $(df -h / | awk 'NR==2 {print $3 "/" $2 " (" $5 " used)"}')"
+    
+    echo
+    
+    # Package info
+    echo -e "${WHITE}Package Information:${NC}"
+    local total_packages=$(pacman -Q | wc -l)
+    local explicit_packages=$(pacman -Qe | wc -l)
+    local orphan_packages=$(pacman -Qtdq 2>/dev/null | wc -l)
+    
+    echo -e "  Total packages: ${GREEN}$total_packages${NC}"
+    echo -e "  Explicitly installed: ${GREEN}$explicit_packages${NC}"
+    echo -e "  Orphaned packages: ${YELLOW}$orphan_packages${NC}"
+    
+    echo
+    
+    # JFL info
+    echo -e "${WHITE}JFL Information:${NC}"
+    echo -e "  Fucking version: ${GREEN}$JFL_VERSION${NC}"
+    echo -e "  Config file: $JFL_CONFIG"
+    echo -e "  Log file: $JFL_LOG_FILE"
+    echo -e "  Cache directory: $JFL_CACHE_DIR"
+    
+    # Recent activity
+    echo
+    echo -e "${WHITE}Recent Activity:${NC}"
+    if [[ -f "$JFL_LOG_FILE" ]]; then
+        tail -5 "$JFL_LOG_FILE" | while IFS= read -r line; do
+            echo -e "  $line"
+        done
+    else
+        echo -e "  No activity logged yet."
+    fi
+    
+    echo -e "${RED}${BOLD}═══════════════════════════════════════════════════════════════${NC}"
+}
+
+# Show help
+show_help() {
+    print_header
+    echo
+    echo -e "${WHITE}Usage:${NC}"
+    echo -e "  ${CYAN}fucking${NC} ${YELLOW}<command>${NC} ${WHITE}[options]${NC}"
+    echo
+    echo -e "${WHITE}Commands:${NC}"
+    echo -e "  ${CYAN}install${NC} ${WHITE}<package>...${NC}     Install packages"
+    echo -e "  ${CYAN}remove${NC} ${WHITE}<package>...${NC}      Remove packages"
+    echo -e "  ${CYAN}search${NC} ${WHITE}<query>${NC}           Search for packages"
+    echo -e "  ${CYAN}update${NC}                     Update package databases"
+    echo -e "  ${CYAN}upgrade${NC}                    Upgrade the entire system"
+    echo -e "  ${CYAN}info${NC} ${WHITE}<package>...${NC}        Show package information"
+    echo -e "  ${CYAN}list${NC} ${WHITE}[filter]${NC}            List installed packages"
+    echo -e "  ${CYAN}clean${NC}                      Clean package cache"
+    echo -e "  ${CYAN}stats${NC}                      Show system statistics"
+    echo -e "  ${CYAN}help${NC}                       Show this help message"
+    echo
+    echo -e "${WHITE}Examples:${NC}"
+    echo -e "  ${CYAN}sudo fucking install${NC} ${WHITE}firefox${NC}      Install Firefox"
+    echo -e "  ${CYAN}sudo fucking remove${NC} ${WHITE}firefox${NC}       Remove Firefox"
+    echo -e "  ${CYAN}fucking search${NC} ${WHITE}web browser${NC}      Search for web browsers"
+    echo -e "  ${CYAN}sudo fucking upgrade${NC}                 Upgrade system"
+    echo
+    echo -e "${WHITE}Special Commands:${NC}"
+    echo -e "  Use with ${YELLOW}'just'${NC} alias: ${CYAN}just fucking install${NC} ${WHITE}<package>${NC}"
+    echo -e "  Multiple packages: ${CYAN}sudo fucking install${NC} ${WHITE}pkg1 pkg2 pkg3${NC}"
+    echo
+    echo -e "${YELLOW}JFL: It's not rocket science, try to keep up.${NC}"
+}
+
+# Main function
+main() {
+    # Initialize
+    init_logging
+    check_pacman
+    
+    # Parse command
+    case "${1:-help}" in
+        install)
+            check_root
+            shift
+            install_packages "$@"
+            ;;
+        remove|uninstall)
+            check_root
+            shift
+            remove_packages "$@"
+            ;;
+        search)
+            shift
+            search_packages "$@"
+            ;;
+        update|refresh)
+            check_root
+            update_databases
+            ;;
+        upgrade|dist-upgrade|full-upgrade)
+            check_root
+            upgrade_system
+            ;;
+        info|show)
+            shift
+            info_packages "$@"
+            ;;
+        list|ls)
+            shift
+            list_packages "$@"
+            ;;
+        clean|cleanup)
+            check_root
+            clean_cache
+            ;;
+        stats|status|info)
+            show_stats
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        version|--version|-v)
+            echo "Just Fucking Linux Package Manager v$JFL_VERSION"
+            ;;
+        *)
+            print_error "Unknown command: ${BOLD}$1${NC}"
+            echo
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+# Run main function with all arguments
+main "$@"

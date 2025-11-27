@@ -1,0 +1,64 @@
+---
+# Just Fucking Linux Calamares Branding Configuration
+# Dark, aggressive theme with red accents
+
+componentName:  jfl
+
+strings:
+    productName:         Just Fucking Linux
+    shortProductName:    JFL
+    version:             1.0.0
+    shortVersion:        1.0
+    versionedName:       Just Fucking Linux 1.0.0
+    shortVersionedName:  JFL 1.0
+    bootloaderEntryName: JFL
+
+images:
+    productLogo:        "jfl-logo.png"
+    productIcon:        "jfl-icon.png"
+    productWelcome:     "jfl-welcome.png"
+
+slideshow:            "show.qml"
+
+style:
+    SidebarBackground:    "#1C1C1E"
+    SidebarText:          "#F2F2F7"
+    SidebarTextSelect:    "#FF3B30"
+    SidebarBackgroundSelect: "#FF3B30"
+    SidebarIcon:          "#8E8E93"
+    SidebarIconSelect:    "#F2F2F7"
+    SidebarWidth:         180
+    
+    # Main background and text colors
+    Background:           "#1C1C1E"
+    Text:                 "#F2F2F7"
+    TextBright:           "#FFFFFF"
+    TextLink:             "#007AFF"
+    TextLinkVisited:      "#5856D6"
+    
+    # Accent colors
+    Accent:               "#FF3B30"
+    AccentLight:          "#FF6B60"
+    AccentDark:           "#D12B20"
+    
+    # Button colors
+    ButtonBackground:     "#FF3B30"
+    ButtonText:           "#FFFFFF"
+    ButtonBorder:         "#FF3B30"
+    
+    # Progress bar
+    ProgressBarBackground: "#2C2C2E"
+    ProgressBarForeground: "#FF3B30"
+    ProgressBarText:       "#FFFFFF"
+    
+    # View steps colors
+    ViewStepBackground:   "#1C1C1E"
+    ViewStepText:          "#8E8E93"
+    ViewStepTextSelect:    "#F2F2F7"
+    ViewStepBackgroundSelect: "#FF3B30"
+
+# CSS stylesheet for the installer
+stylesheet:   "jfl.qss"
+
+# QML theme file
+qmltheme:     "jfl.qml"
